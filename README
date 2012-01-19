@@ -1,0 +1,9 @@
+Personal reminder application
+
+clojure based dsl and background agent
+
+Notes and concepts:
+Start an agent with a file for the configuration location (serialized clojure data structures)
+cli updates the file
+agent polls the file, checks for events, and reacts accordingly
+probably need some kind of audit file of actions taken as well
