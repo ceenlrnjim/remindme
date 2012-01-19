@@ -22,5 +22,6 @@
       (cond (= operation "a") (append request-store (first details))
             (= operation "d") (delete request-store (first details))
             (= operation "l") (display-requests request-store)
+            (= operation "init") (init-store (:store options))
             :else (println "operation must be a(dd) d(elete) or l(ist)"))))))
 
