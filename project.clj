@@ -3,5 +3,6 @@
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [org.clojure/tools.logging "0.2.3"]
                  [log4j/log4j "1.2.16"]
+                 [joda-time/joda-time "2.0"]
                  [org.clojure/tools.cli "0.2.1"]]
   :main remindme.cli)

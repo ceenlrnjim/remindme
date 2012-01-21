@@ -1,4 +1,6 @@
-(ns remindme.core)
+(ns remindme.core
+  (:import [org.joda.time.format DateTimeFormat])
+  (:import [org.joda.time LocalDateTime LocalTime LocalDate]))
 
 ; key abstractions
 ; - requests: something the remindme has been asked to do
@@ -29,31 +31,30 @@
   [condition & actions]
   `(if ~condition (do ~@actions) nil))
 
-(def ^:dynamic *last-execution* -1)
+; LocalDateTime of the last execution
+(def ^:dynamic *last-execution* nil)
 
 (defmacro with-last-execution
+  "converts millis to joda localdatetime and binds for functions to use"
   [millis & body]
-  `(binding [*last-execution* millis]
+  `(binding [*last-execution* (LocalDateTime. millis)]
      (do ~@body)))
 
 (defn- today-at
-  "Returns a millisecond (date) for the specified time on the current day"
+  "Returns a joda DateTime (date) for the specified time on the current day"
   [time-spec]
-  (let [daystring "yyyyMMdd"
-        timestring "hh:mmaa"
-        df-day (java.text.SimpleDateFormat. daystring)
-        df-time (java.text.SimpleDateFormat. (str daystring timestring))]
-    (.getTime 
-      (.parse 
-        df-time (str (.format df-day (java.util.Date.)) time-spec)))))
+  (let [d (LocalDate.)
+        t (.parseLocalTime (DateTimeFormat/forPattern "hh:mmaa") time-spec)]
+    (.toLocalDateTime d t)))
 
 (defn at
   "time-spec: (1-12):(0-59)am|pm"
   ([time-spec] (at time-spec true))
   ([time-spec additional-condition]
-   (let [target (today-at time-spec)]
-     (cond (> *last-execution* target) false ; already executed this rule
-           (> (System/currentTimeMillis) target) additional-condition
+   (let [target (today-at time-spec)
+         now (LocalDateTime.)]
+     (cond (.isAfter *last-execution* target) false ; already executed this rule
+           (.isAfter now target) additional-condition ; if we are at the specified time (after technically), then go if the other condition is true
            :else false))))
 
 
