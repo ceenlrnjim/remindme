@@ -28,11 +28,14 @@
   [f]
   (log/debug "Creating file store at location" f)
   (reify RequestStore
-    ; TODO: add actual implementation
     (append [_ r] 
       (let [rs (load-store f)]
         (save-store (conj rs {:id (next-id rs) :request r}) f)))
     (requests [_]
-      (load-store f)
+      (load-store f))
     (delete [_ id] 
-      (save-store (filter #(not= (:id %) id) rs) (load-store f) f)))))
+      (save-store 
+        (reduce
+          #(conj %1 %2) 
+          []
+          (filter #(not= (:id %) (Integer/parseInt id)) (load-store f))) f))))

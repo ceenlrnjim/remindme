@@ -9,4 +9,4 @@
   "Function specification for a repository that stores requests "
   (append [_ r] "Add a request to the store")
   (requests [_] "Returns a sequence of requests from the store")
-  (delete [_ r] "removes the specified request from the store"))
+  (delete [_ id] "removes the specified request from the store"))
