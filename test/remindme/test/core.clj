@@ -48,3 +48,29 @@
       (is (not (at ten-min-back-string (< 10 5))))
       (is (at ten-min-back-string (< 5 10))))))
 
+
+(def date-pattern (ns-resolve 'remindme.core 'date-pattern))
+(deftest test-date-pattern
+  (is (= (date-pattern "12/24") "mm/dd"))
+  (is (= (date-pattern "12/24/2012") "mm/dd/yyyy")))
+
+(deftest test-on-already-executed
+  (binding [*last-execution* (LocalDateTime.)]
+    (let [today (LocalDate.)
+          today-spec (str (.getMonthOfYear today) "/" (.getDayOfMonth today) "/" (.getYear today))]
+      (is (not (on today-spec))))))
+      
+(deftest test-on-not-yet
+  (binding [*last-execution* nil] ; not yet executed
+    (let [target (.plusDays (LocalDate.) 1) ; target is for tomorrow
+          target-spec (str (.getMonthOfYear target) "/" (.getDayOfMonth target) "/" (.getYear target))]
+      (is (not (on target-spec))))))
+      
+(deftest test-on-ready
+  (binding [*last-execution* nil] ; not yet executed
+    (let [target (LocalDate.) ; target is for today
+          target-spec (str (.getMonthOfYear target) "/" (.getDayOfMonth target) "/" (.getYear target))]
+      (is (on target-spec))
+      (is (not (on target-spec false)))
+      (is (not (on target-spec (< 10 5))))
+      (is (on target-spec (< 1 5))))))

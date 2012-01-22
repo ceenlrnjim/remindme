@@ -1,9 +1,8 @@
 Personal reminder application
 
-clojure based dsl and background agent
+This is a "free-time" app - simple personal scheduler.  Composed of a command line tool for adding reminders,
+and a background process that carries them out.  This is a learning exercise for
+1) More clojure
+2) building an internal dsl in clojure
+3) homoiconicity - trying this whole "code is data" ting
 
-Notes and concepts:
-Start an agent with a file for the configuration location (serialized clojure data structures)
-cli updates the file
-agent polls the file, checks for events, and reacts accordingly
-probably need some kind of audit file of actions taken as well

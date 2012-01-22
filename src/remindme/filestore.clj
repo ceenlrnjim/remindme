@@ -2,6 +2,8 @@
   (:require [clojure.tools.logging :as log])
   (:use [remindme.core]))
 
+; TODO: agent needs to add the :last-execution member to the map
+
 (defn- load-store
   "Loads the content from disk"
   [f]
