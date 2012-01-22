@@ -75,6 +75,37 @@
            target (.parseLocalDate (DateTimeFormat/forPattern (date-pattern date-spec)) date-spec)]
        (and (.equals now target) additional-condition)))))
 
+(defn- every-interval
+  [[n interval] additional-condition]
+  false) ; TODO:
 
+(defn- ran-today?
+  [last-execution]
+  (if last-execution (.equals (LocalDate.) (.toLocalDate last-execution)) false))
+
+(def days {:mon 1 :tue 2 :wed 3 :thu 4 :fri 5 :sat 6 :sun 7})
+
+(defn- every-day
+  [day-spec additional-condition]
+  (if (ran-today? *last-execution*) false
+    (and 
+      (= (.getDayOfWeek (LocalDate.)) (get days day-spec)) 
+      (not (ran-today? *last-execution*))
+      additional-condition)))
+
+(defn every
+  "recur-spec: [n :hours | :mins | :days | :weeks]
+   recur-spec: :mon :tue :wed :thu :fri :sat :sun"
+  ([recur-spec] (every recur-spec true))
+  ([recur-spec additional-condition]
+   (if (keyword? recur-spec)
+     (every-day recur-spec additional-condition)
+     (every-interval recur-spec additional-condition))))
+
+
+; other verbs to try
+    ; after
+    ; until
+    ; except
 
 

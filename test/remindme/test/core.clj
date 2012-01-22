@@ -74,3 +74,25 @@
       (is (not (on target-spec false)))
       (is (not (on target-spec (< 10 5))))
       (is (on target-spec (< 1 5))))))
+
+(defn- day-spec
+  [jd]
+  (get {1 :mon 2 :tue 3 :wed 4 :thu 5 :fri 6 :sat 7 :sun} (.getDayOfWeek jd)))
+
+(deftest test-every-day-already-executed
+  (binding [*last-execution* (LocalDateTime.)]
+    (let [day-spec (day-spec (LocalDate.))]
+      (println day-spec " : " *last-execution*)
+      (is (not (every day-spec)))))
+  (binding [*last-execution* (.minusDays (LocalDateTime.) 7)]
+      (is (every (day-spec (LocalDate.))))))
+
+(deftest test-every-day
+  (binding [*last-execution* nil]
+    (is (not (every (day-spec (.plusDays (LocalDate.) 1))))) ; day doesn't match
+    (is (every (day-spec (LocalDate.)))) ; day matches
+    (is (every (day-spec (LocalDate.)) (> 2 1))) ; day matches with valid additional condition
+    (is (every (day-spec (.plusDays (LocalDate.) 7)))) ; next week
+    (is (not (every (day-spec (LocalDate.)) (> 1 2)))))) ; day matches with invalid additional condition
+
+
