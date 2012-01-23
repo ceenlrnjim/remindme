@@ -75,6 +75,11 @@
            target (.parseLocalDate (DateTimeFormat/forPattern (date-pattern date-spec)) date-spec)]
        (and (.equals now target) additional-condition)))))
 
+(defn- millis-diff
+  "returns the number of milliseconds between two LocalDateTimes"
+  [d1 d2]
+  (Math/abs (- (.getTime (.toDate d1)) (.getTime (.toDate d2)))))
+
 (defn- every-interval
   [[n interval] additional-condition]
   false) ; TODO:
