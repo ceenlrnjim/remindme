@@ -25,24 +25,26 @@
   (.print (DateTimeFormat/forPattern "hh:mmaa") ldt))
 
 (deftest test-at-already-executed
-  (binding [*last-execution* (today-at "5:00am")]
-    (is (not (at "4:55am"))))
-  (binding [*last-execution* (today-at "4:00am")]
-    (is (at "4:55am"))))
+  (binding [*last-execution* nil]
+    (is (not (at (time-spec (now-plus 1))))))
+  (binding [*last-execution* nil]
+    (is (at (time-spec (now-plus -1)))))
+  (binding [*last-execution* (now-plus -5)]
+    (is (not (at (time-spec (LocalDateTime.)))))))
 
 (deftest test-at-not-yet
-  (binding [*last-execution* (today-at "12:01am")]
+  (binding [*last-execution* nil]
     (let [ten-min-ahead-string (time-spec (now-plus 10))]
     ; need to get a few minutes back so that the at time is
       (is (not (at ten-min-ahead-string))))))
 
 (deftest test-at-ready
-  (binding [*last-execution* (today-at "12:01am")]
+  (binding [*last-execution* nil]
     (let [ten-min-back-string (time-spec (now-plus -10))]
       (is (at ten-min-back-string)))))
 
 (deftest test-at-ready-with-additional
-  (binding [*last-execution* (today-at "12:01am")]
+  (binding [*last-execution* nil]
     (let [ten-min-back-string (time-spec (now-plus -10))]
       (is (not (at ten-min-back-string false)))
       (is (not (at ten-min-back-string (< 10 5))))
@@ -117,4 +119,21 @@
     (is (not (every [6 :mins]))))
   (binding [*last-execution* (.minusDays (LocalDateTime.) 1)]
     (is (every [1 :days]))
+    (is (every [1 :days] true))
+    (is (every [1 :days] (> 2 1)))
+    (is (not (every [1 :days] (> 1 2))))
     (is (not (every [1 :weeks])))))
+
+
+(deftest test-until
+  (binding [*last-execution* nil]
+    (is (every [10 :mins] (until (at (time-spec (now-plus 20)))))))
+  (binding [*last-execution* (.minusMinutes (LocalDateTime.) 12)]
+    (is (every [10 :mins] (until (at (time-spec (now-plus 20)))))))
+  (binding [*last-execution* (.minusMinutes (LocalDateTime.) 8)]
+    (is (not (every [10 :mins] (until (at (time-spec (now-plus 20))))))))
+  (binding [*last-execution* nil]
+    (is (not (every [5 :mins] (until (at (time-spec (now-plus -1))))))))
+  (binding [*last-execution* (.minusMinutes (LocalDateTime.) 10)]
+    (is (not (every [5 :mins] (until (at (time-spec (now-plus -1)))))))))
+

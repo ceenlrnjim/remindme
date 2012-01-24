@@ -56,9 +56,12 @@
   ([time-spec additional-condition]
    (let [target (today-at time-spec)
          now (LocalDateTime.)]
-     (cond (.isAfter *last-execution* target) false ; already executed this rule
-           (.isAfter now target) additional-condition ; if we are at the specified time (after technically), then go if the other condition is true
-           :else false))))
+     (cond 
+       ; TODO: this nil check causes problems for until - same *last-execution* applies to both the parent
+       ; and the child check - until might be more complicated than 'not'
+       (not (nil? *last-execution*)) false; already executed this rule
+       (.isAfter now target) additional-condition ; if we are at the specified time (after technically), then go if the other condition is true
+       :else false))))
 
 (defn- date-pattern
   "Checks whether or not a year as been added for the date format string"
@@ -95,9 +98,11 @@
 
 (defn- every-interval
   [[n interval] additional-condition]
-  (or 
-    (nil? *last-execution*)
-    (>= (millis-diff *last-execution* (LocalDateTime.)) (millis-interval n interval))))
+  (and 
+    (or 
+      (nil? *last-execution*)
+      (>= (millis-diff *last-execution* (LocalDateTime.)) (millis-interval n interval)))
+    additional-condition))
 
 (defn- ran-today?
   [last-execution]
@@ -121,6 +126,9 @@
    (if (keyword? recur-spec)
      (every-day recur-spec additional-condition)
      (every-interval recur-spec additional-condition))))
+
+; TODO: how does *last-execution* figure into until and except?
+(def until not)
 
 
 ; other verbs to try
