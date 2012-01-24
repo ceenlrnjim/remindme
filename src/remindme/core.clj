@@ -84,9 +84,13 @@
   "converts n into milliseconds where interval is :hours :mins :days :weeks"
   [n interval]
   (let [multipliers {:mins (* 1000 60)
+                     :min (* 1000 60)
                      :hours (* 1000 60 60)
+                     :hour (* 1000 60 60)
                      :days (* 1000 60 60 24)
-                     :weeks (* 1000 60 60 24 7)}]
+                     :day (* 1000 60 60 24)
+                     :weeks (* 1000 60 60 24 7)
+                     :week (* 1000 60 60 24 7)}]
     (* n (get multipliers interval))))
 
 (defn- every-interval
