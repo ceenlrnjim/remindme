@@ -80,9 +80,20 @@
   [d1 d2]
   (Math/abs (- (.getTime (.toDate d1)) (.getTime (.toDate d2)))))
 
+(defn- millis-interval
+  "converts n into milliseconds where interval is :hours :mins :days :weeks"
+  [n interval]
+  (let [multipliers {:mins (* 1000 60)
+                     :hours (* 1000 60 60)
+                     :days (* 1000 60 60 24)
+                     :weeks (* 1000 60 60 24 7)}]
+    (* n (get multipliers interval))))
+
 (defn- every-interval
   [[n interval] additional-condition]
-  false) ; TODO:
+  (or 
+    (nil? *last-execution*)
+    (>= (millis-diff *last-execution* (LocalDateTime.)) (millis-interval n interval))))
 
 (defn- ran-today?
   [last-execution]
@@ -110,7 +121,11 @@
 
 ; other verbs to try
     ; after
-    ; until
-    ; except
+    ; until - always true until specified ? on, at (every [10 :mins] (until (on "1/21" (at "12:54pm"))))
+    ; except - another simple inversion of other verbs?
 
 
+; actions to take
+; - alert
+; - fork
+; - 

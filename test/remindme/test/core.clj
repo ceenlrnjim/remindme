@@ -95,4 +95,26 @@
     (is (every (day-spec (.plusDays (LocalDate.) 7)))) ; next week
     (is (not (every (day-spec (LocalDate.)) (> 1 2)))))) ; day matches with invalid additional condition
 
+(def millis-diff (ns-resolve 'remindme.core 'millis-diff))
+(deftest test-millis-diff
+  (let [d (LocalDateTime.)]
+    (is (= (millis-diff d (.plusSeconds d 1)) 1000))
+    (is (= (millis-diff d (.plusMinutes d 1)) (* 1000 60)))))
 
+(def millis-interval (ns-resolve 'remindme.core 'millis-interval))
+(deftest test-millis-interval
+  (is (= (millis-interval 1 :mins) 60000))
+  (is (= (millis-interval 2 :mins) 120000))
+  (is (= (millis-interval 1 :hours) 3600000))
+  (is (= (millis-interval 1 :days) 86400000))
+  (is (= (millis-interval 1 :weeks) 604800000)))
+
+(deftest test-every-interval
+  (binding [*last-execution* nil]
+    (is (every [1 :mins])))
+  (binding [*last-execution* (.minusMinutes (LocalDateTime.) 5)]
+    (is (every [5 :mins]))
+    (is (not (every [6 :mins]))))
+  (binding [*last-execution* (.minusDays (LocalDateTime.) 1)]
+    (is (every [1 :days]))
+    (is (not (every [1 :weeks])))))
