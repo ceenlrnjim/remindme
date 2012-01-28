@@ -7,12 +7,12 @@
 (defn load-store
   "Loads the content from disk"
   [f]
-  (eval (read-string (slurp f))))
+  (read-string (slurp f)))
 
 (defn save-store
   "Saves the repository data structure to disk"
   [rs f]
-  (spit f (str rs)))
+  (spit f (prn-str rs)))
 
 ; For now pattern will be, read full contents, change data structure, reserialize to disk replacing the file
 (defn init-store
@@ -36,7 +36,8 @@
     (requests [_]
       (load-store f))
     (request-map [_ t]
-      (save-store (map t (load-store f)) f)) ; TODO: this converts to a lazy sequence which doesn't serialize right
+      ; TODO: need to convert last-execution to a string when saving and back to a LocalDateTime when loading
+      (save-store (map t (load-store f)) f))
     (delete [_ id] 
       (save-store 
         (reduce
