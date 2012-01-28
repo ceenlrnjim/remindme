@@ -4,12 +4,12 @@
 
 ; TODO: agent needs to add the :last-execution member to the map
 
-(defn- load-store
+(defn load-store
   "Loads the content from disk"
   [f]
   (eval (read-string (slurp f))))
 
-(defn- save-store
+(defn save-store
   "Saves the repository data structure to disk"
   [rs f]
   (spit f (str rs)))
@@ -35,6 +35,8 @@
         (save-store (conj rs {:id (next-id rs) :request r}) f)))
     (requests [_]
       (load-store f))
+    (request-map [_ t]
+      (save-store (map t (load-store f)) f)) ; TODO: this converts to a lazy sequence which doesn't serialize right
     (delete [_ id] 
       (save-store 
         (reduce

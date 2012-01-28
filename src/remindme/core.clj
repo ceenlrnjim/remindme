@@ -11,6 +11,7 @@
   "Function specification for a repository that stores requests "
   (append [_ r] "Add a request to the store")
   (requests [_] "Returns a sequence of requests from the store")
+  (request-map [_ t] "Executes map on all requests with thunk t and persists the result as the new store - thunk should take a request and return a request")
   (delete [_ id] "removes the specified request from the store"))
 
 ; Functions/macros/data structures usable in defining reminders
@@ -32,7 +33,7 @@
 ;
 (defmacro jeeves
   [condition & actions]
-  `(if ~condition (do ~@actions) nil))
+  `(if ~condition (do ~@actions (LocalDateTime.)) nil))
 
 ; LocalDateTime of the last execution
 (def ^:dynamic *last-execution* nil)
@@ -127,9 +128,14 @@
      (every-day recur-spec additional-condition)
      (every-interval recur-spec additional-condition))))
 
-; TODO: how does *last-execution* figure into until and except?
-(def until not)
-
+; TODO:
+; at used within until will fail with any condition that supports a non-nil *last-exception*
+; What if we tracked both the last execution and last skipped time?
+; (def until not)
+(defn until
+  "Returns false when the specified time (at/on) to cancel out an every etc."
+  [condition]
+  (not condition))
 
 ; other verbs to try
     ; after
