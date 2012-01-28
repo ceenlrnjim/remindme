@@ -11,7 +11,7 @@
     request-store
     (fn [r]
       (binding [*last-execution* (:last-execution r)]
-        ; TODO: currently need to namespace qualify the "jeeves" macro in strings from the file
+        ; TODO: currently need to namespace qualify the "jeeves" macro and other core functions in strings from the file
         (log/debug "Executing: " (:request r))
         (def new-execution-time (load-string (:request r)))
         (if new-execution-time (assoc r :last-execution new-execution-time) r)))))
